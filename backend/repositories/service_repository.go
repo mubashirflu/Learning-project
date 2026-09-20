@@ -26,6 +26,10 @@ type ServiceRepository struct {
 	db *sql.DB
 }
 
+func (repository *ServiceRepository) GetServicesByUser(ctx context.Context, userID uint) (any, any) {
+	panic("unimplemented")
+}
+
 func NewServiceRepository(db *sql.DB) *ServiceRepository {
 	return &ServiceRepository{db: db}
 }
@@ -60,6 +64,23 @@ func (repository *ServiceRepository) CreateService(
 
 	return service, err
 }
+func (repository *ServiceRepository) GetServiceByID(ctx context.Context, serviceID uint) (models.Services, error) {
+	var service models.Services
+	err := repository.db.QueryRowContext(ctx, `
+		SELECT id, user_id, name, description, price, duration_minutes, created_at
+		FROM services
+		WHERE id = $1`, serviceID).Scan(
+		&service.ID,
+		&service.USER_ID,
+		&service.NAME,
+		&service.DESCRIPTION,
+		&service.PRICE,
+		&service.DURATION_MINUTES,
+		&service.CREATE_AT,
+	)
+	return service, err
+}
+
 func (repository *ServiceRepository) GetServicesByUserID(
 	ctx context.Context,
 	userID uint,

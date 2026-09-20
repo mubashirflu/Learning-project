@@ -69,3 +69,28 @@ func (repository *UserRepository) GetUserByEmail(
 
 	return user, err
 }
+func (repository *UserRepository) GetUserByID(
+	ctx context.Context,
+	userID uint,
+) (models.User, error) {
+
+	var user models.User
+
+	err := repository.db.QueryRowContext(
+		ctx,
+		`
+		SELECT id, name, email, password, created_at
+		FROM users
+		WHERE id = $1
+		`,
+		userID,
+	).Scan(
+		&user.ID,
+		&user.Name,
+		&user.Email,
+		&user.Password,
+		&user.CreatedAt,
+	)
+
+	return user, err
+}

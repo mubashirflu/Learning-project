@@ -8,10 +8,10 @@ import (
 )
 
 type CustomerRepositoryInputs struct {
-	UserID uint    `json:"user_id"`
-	Name   string  `json:"name"`
-	Email  string  `json:"email"`
-	Phone  float64 `json:"phone"`
+	UserID uint   `json:"user_id"`
+	Name   string `json:"name"`
+	Email  string `json:"email"`
+	Phone  string `json:"phone"`
 }
 type CustomerRepository struct {
 	db *sql.DB
@@ -20,6 +20,11 @@ type CustomerRepository struct {
 func NewCustomerReposiotyr(db *sql.DB) *CustomerRepository {
 	return &CustomerRepository{db: db}
 }
+
+func NewCustomerRepository(db *sql.DB) *CustomerRepository {
+	return &CustomerRepository{db: db}
+}
+
 func (repositories *CustomerRepository) CreateCustomer(ctx context.Context,
 	input CustomerRepositoryInputs,
 ) (models.Customers, error) {
@@ -27,15 +32,16 @@ func (repositories *CustomerRepository) CreateCustomer(ctx context.Context,
 	err := repositories.db.QueryRowContext(
 		ctx,
 		`
-        INSERT INTO customers (uesr_id,name, email, phone,crated_at)
-        VALUES ($1, $2, $3,$4,)
-        RETURNING user_id, name, email, phone, created_at
+	INSERT INTO customers (user_id, name, email, phone)
+	VALUES ($1, $2, $3, $4)
+	RETURNING id, user_id, name, email, phone, created_at
         `,
 		input.UserID,
 		input.Name,
 		input.Email,
 		input.Phone,
 	).Scan(
+		&customers.ID,
 		&customers.USER_ID,
 		&customers.NAME,
 		&customers.EMAIL,
@@ -44,7 +50,23 @@ func (repositories *CustomerRepository) CreateCustomer(ctx context.Context,
 	)
 	return customers, err
 }
-func (repository *CustomerRepository) GetServicesByUserID(
+func (repository *CustomerRepository) GetCustomerByID(ctx context.Context, customerID uint) (models.Customers, error) {
+	var customer models.Customers
+	err := repository.db.QueryRowContext(ctx, `
+		SELECT id, user_id, name, email, phone, created_at
+		FROM customers
+		WHERE id = $1`, customerID).Scan(
+		&customer.ID,
+		&customer.USER_ID,
+		&customer.NAME,
+		&customer.EMAIL,
+		&customer.PHONE,
+		&customer.CREATE_AT,
+	)
+	return customer, err
+}
+
+func (repository *CustomerRepository) GetCustomersByUserID(
 	ctx context.Context,
 	userID uint,
 ) ([]models.Customers, error) {
