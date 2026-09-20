@@ -151,3 +151,47 @@ func (h *AppointmentHandler) Cancel(c *gin.Context) {
 		"message": "appointment cancelled successfully",
 	})
 }
+func (h *AppointmentHandler) GetByDate(c *gin.Context) {
+
+	userIDValue, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "user not found",
+		})
+		return
+	}
+
+	userID, ok := userIDValue.(uint)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "invalid user id",
+		})
+		return
+	}
+
+	dateParam := c.Param("date")
+
+	appointmentDate, err := time.Parse("2006-01-02", dateParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "invalid date format, use YYYY-MM-DD",
+		})
+		return
+	}
+
+	appointments, err := h.appointmentService.GetAppointmentsByDate(
+		c.Request.Context(),
+		userID,
+		appointmentDate,
+	)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"appointments": appointments,
+	})
+}

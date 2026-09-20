@@ -186,3 +186,28 @@ func (service *AppointmentService) GetAppointmentsByService(
 
 	return appointments, nil
 }
+func (service *AppointmentService) GetAppointmentsByDate(
+	ctx context.Context,
+	userID uint,
+	appointmentDate time.Time,
+) ([]models.Appointments, error) {
+
+	if userID == 0 {
+		return nil, fmt.Errorf("user id is required")
+	}
+
+	if appointmentDate.IsZero() {
+		return nil, fmt.Errorf("appointment date is required")
+	}
+
+	appointments, err := service.appointments.GetAppointmentsByUserAndDate(
+		ctx,
+		userID,
+		appointmentDate,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("get appointments by date: %w", err)
+	}
+
+	return appointments, nil
+}

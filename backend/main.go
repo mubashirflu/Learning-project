@@ -16,6 +16,7 @@ import (
 )
 
 func main() {
+
 	if err := godotenv.Load(); err != nil {
 		log.Println("Warning: .env file not found")
 	}
@@ -26,6 +27,7 @@ func main() {
 
 	defer db.Close()
 	router := gin.Default()
+	router.Use(middleware.CorsMiddleware())
 	userRepo := repositories.NewUserRepository(db)
 
 	serviceRepo := repositories.NewServiceRepository(db)
@@ -82,7 +84,6 @@ func main() {
 		auth.POST("/register", userHandler.Register)
 		auth.POST("/login", userHandler.Login)
 	}
-
 	// --------------------------------
 	// Protected Routes
 	// --------------------------------
@@ -159,6 +160,10 @@ func main() {
 		api.PUT(
 			"/appointments/:id/cancel",
 			appointmentHandler.Cancel,
+		)
+		api.GET(
+			"/appointments/date/:date",
+			appointmentHandler.GetByDate,
 		)
 	}
 

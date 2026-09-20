@@ -163,3 +163,64 @@ func (repositories *Appointments) getAppointments(
 
 	return appointments, nil
 }
+func (repositories *Appointments) GetAppointmentsByUserAndDate(
+	ctx context.Context,
+	userID uint,
+	appointmentDate time.Time,
+) ([]models.Appointments, error) {
+
+	rows, err := repositories.db.QueryContext(
+		ctx,
+		`
+		SELECT
+			a.id,
+			a.customer_id,
+			a.service_id,
+			a.appointment_date,
+			a.start_time,
+			a.end_time,
+			a.status,
+			a.created_at
+		FROM appointments a
+		JOIN services s
+			ON s.id = a.service_id
+		WHERE s.user_id = $1
+		  AND a.appointment_date = $2
+		ORDER BY a.start_time, a.id
+		`,
+		userID,
+		appointmentDate,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	appointments := make([]models.Appointments, 0)
+
+	for rows.Next() {
+		var appointment models.Appointments
+
+		err := rows.Scan(
+			&appointment.ID,
+			&appointment.CUSTOMER_ID,
+			&appointment.SERVICE_ID,
+			&appointment.APPOINTMENT_DATE,
+			&appointment.START_TIME,
+			&appointment.END_TIME,
+			&appointment.STATUS,
+			&appointment.CREATED_AT,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		appointments = append(appointments, appointment)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return appointments, nil
+}
