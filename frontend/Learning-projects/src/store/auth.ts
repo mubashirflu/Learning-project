@@ -1,6 +1,6 @@
 
 import { defineStore } from "pinia";
-import { login as loginRequest, register as registerRequest } from "../services/authserrvice";
+import { login as loginRequest, register as registerRequest } from "@/services/authServices";
 
 interface User {
   id: number;

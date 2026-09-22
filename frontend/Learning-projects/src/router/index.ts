@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import Login from "@/view/login.vue";
 import Register from "@/view/register.vue";
 import Dashboard from "@/view/dashboard.vue";
+import Services from "@/view/services.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -30,6 +31,11 @@ const router = createRouter({
       meta: {
         requiresAuth: true,
       },
+    },
+        {
+      path: "/services",
+      name: "services",
+      component: Services,
     },
   ],
 });

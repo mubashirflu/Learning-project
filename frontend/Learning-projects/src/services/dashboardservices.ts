@@ -1,4 +1,4 @@
-import api from "../services/api";
+import api from "./axios";
 
 const getServices = async () => {
   const response = await api.get("/services");
@@ -30,10 +30,20 @@ const getAppointmentsByService = async (
 
   return response.data;
 };
+const getAppointmentsByDate = async (date: string) => {
+  const response = await api.get(
+    `/appointments/date/${date}`,
+  );
+
+  return response.data;
+};
 
 export {
   getServices,
   getCustomers,
   getAppointmentsByCustomer,
   getAppointmentsByService,
+  getAppointmentsByDate
+  
 };
+

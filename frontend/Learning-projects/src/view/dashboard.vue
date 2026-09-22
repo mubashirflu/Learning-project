@@ -6,7 +6,7 @@
         <span /><span /><span />
       </button>
       <span class="mobile-brand">Schedula</span>
-    </header>
+    </header> 
 
     <!-- Sidebar -->
     <aside class="sidebar" :class="{ open: isSidebarOpen }">
@@ -82,22 +82,16 @@
   </div>
 </template>
 
-<script setup>
+<!-- <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/store/auth'
-
-// TODO (next step): replace these placeholders with real Pinia stores, e.g.
-//   import { useServiceStore } from '@/store/service'
-//   import { useCustomerStore } from '@/store/customer'
-//   import { useAppointmentStore } from '@/store/appointment'
-// then derive these four values as computed() from store state, and call
-// each store's fetch action inside onMounted(). Dashboard.vue should never
-// call Axios/the API directly — always through the store.
+import { useDashboardStore } from '@/store/dashboard'
 const totalServices = ref(null)
 const totalCustomers = ref(null)
 const todaysAppointments = ref(null)
 const bookedAppointments = ref(null)
+const dashboard=useDashboardStore()
 
 const formatValue = (val) => (val === null || val === undefined ? '—' : val)
 
@@ -109,10 +103,85 @@ const handleLogout = async () => {
   await authStore.logout()
   router.push('/login')
 }
-</script>
+</script> -->
+<!-- <script setup>
+import { ref } from 'vue'
+import { onMounted } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/store/auth'
+import { useDashboardStore } from '@/store/dashboard'
+
+const router = useRouter()
+const authStore = useAuthStore()
+const dashboardStore = useDashboardStore()
+
+const {
+  totalServices,
+  totalCustomers,
+  todaysAppointments,
+  bookedAppointments
+} = storeToRefs(dashboardStore)
+
+const formatValue = (val) =>
+  val === null || val === undefined ? '—' : val
+
+const isSidebarOpen = ref(false)
+
+// Load dashboard data when page opens
+onMounted(() => {
+  dashboardStore.fetchDashboardData()
+})
+
+const handleLogout = async () => {
+  await authStore.logout()
+  router.push('/login')
+}
+</script> -->
 
 <!-- Inline icon components (dependency-free) -->
-<script>
+<!-- <script>
+const IconDashboard = {
+  template: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>`
+}
+
+const IconServices = {
+  template: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14.7 6.3a4 4 0 0 1-5.4 5.4L4 17v3h3l5.3-5.3a4 4 0 0 1 5.4-5.4Z"/></svg>`
+}
+
+const IconCustomers = {
+  template: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20c0-3.3 2.5-5.5 5.5-5.5s5.5 2.2 5.5 5.5"/><circle cx="17" cy="8.5" r="2.4"/><path d="M15.2 14.8c2.6.3 4.3 2.4 4.3 5.2"/></svg>`
+}
+
+const IconAppointments = {
+  template: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="4.5" width="17" height="16" rx="2"/><path d="M3.5 9.5h17M8 3v3M16 3v3"/></svg>`
+}
+
+const IconCalendar = IconAppointments
+
+const IconCheck = {
+  template: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9.5"/></svg>`
+}
+
+const IconLogout = {
+  template: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 4H5.5A1.5 1.5 0 0 0 4 5.5v13A1.5 1.5 0 0 0 5.5 20H9"/><path d="M14 15l4-3-4-3M18 12H9"/></svg>`
+}
+
+export default {
+  components: {
+    IconDashboard,
+    IconServices,
+    IconCustomers,
+    IconAppointments,
+    IconCalendar,
+    IconCheck,
+    IconLogout
+  }
+}
+</script> -->
+
+
+<!-- <script>
 const IconDashboard = {
   template: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>`
 }
@@ -143,8 +212,83 @@ export default {
     IconCheck,
     IconLogout
   }
+} -->
+<!-- </script> -->
+
+<script setup>
+import { ref, onMounted, computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/store/auth'
+import { useServiceStore } from '@/store/service'
+// import { useCustomerStore } from '@/store/customer'         // TODO: once built
+// import { useAppointmentStore } from '@/store/appointment'   // TODO: once built
+
+const router = useRouter()
+const authStore = useAuthStore()
+const serviceStore = useServiceStore()
+
+// Real value, comes straight from the services list already being fetched
+const totalServices = computed(() => serviceStore.totalServices)
+
+// Placeholders until Customer/Appointment stores + backend routes exist
+const totalCustomers = ref(null)
+const todaysAppointments = ref(null)
+const bookedAppointments = ref(null)
+
+const formatValue = (val) => (val === null || val === undefined ? '—' : val)
+
+const isSidebarOpen = ref(false)
+
+onMounted(() => {
+  serviceStore.fetchServices()
+})
+
+const handleLogout = async () => {
+  await authStore.logout()
+  router.push('/login')
 }
 </script>
+<!-- Inline icon components (dependency-free) -->
+<script>
+const IconDashboard = {
+  template: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>`
+}
+
+const IconServices = {
+  template: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14.7 6.3a4 4 0 0 1-5.4 5.4L4 17v3h3l5.3-5.3a4 4 0 0 1 5.4-5.4Z"/></svg>`
+}
+
+const IconCustomers = {
+  template: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20c0-3.3 2.5-5.5 5.5-5.5s5.5 2.2 5.5 5.5"/><circle cx="17" cy="8.5" r="2.4"/><path d="M15.2 14.8c2.6.3 4.3 2.4 4.3 5.2"/></svg>`
+}
+
+const IconAppointments = {
+  template: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="4.5" width="17" height="16" rx="2"/><path d="M3.5 9.5h17M8 3v3M16 3v3"/></svg>`
+}
+
+const IconCalendar = IconAppointments
+
+const IconCheck = {
+  template: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9.5"/></svg>`
+}
+
+const IconLogout = {
+  template: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 4H5.5A1.5 1.5 0 0 0 4 5.5v13A1.5 1.5 0 0 0 5.5 20H9"/><path d="M14 15l4-3-4-3M18 12H9"/></svg>`
+}
+
+export default {
+  components: {
+    IconDashboard,
+    IconServices,
+    IconCustomers,
+    IconAppointments,
+    IconCalendar,
+    IconCheck,
+    IconLogout
+  }
+}
+</script>
+
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap');

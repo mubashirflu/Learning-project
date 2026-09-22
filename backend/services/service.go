@@ -107,6 +107,37 @@ func (service *ServiceService) CreateService(
 }
 
 // Get all services of a user
+// func (service *ServiceService) GetServices(
+// 	ctx context.Context,
+// 	userID uint,
+// ) ([]models.Services, error) {
+
+// 	if userID == 0 {
+// 		return nil, fmt.Errorf("user id is required")
+// 	}
+
+// 	result, err := service.serviceRepo.GetServicesByUser(
+// 		ctx,
+// 		userID,
+// 	)
+// 	if err != nil {
+// 		return nil, fmt.Errorf(
+// 			"get services: %w",
+// 			err,
+// 		)
+// 	}
+
+// 	// Repository currently returns any
+// 	services, ok := result.([]models.Services)
+// 	if !ok {
+// 		return nil, fmt.Errorf(
+// 			"invalid services data returned from repository",
+// 		)
+// 	}
+
+// 	return services, nil
+// }
+
 func (service *ServiceService) GetServices(
 	ctx context.Context,
 	userID uint,
@@ -116,22 +147,15 @@ func (service *ServiceService) GetServices(
 		return nil, fmt.Errorf("user id is required")
 	}
 
-	result, err := service.serviceRepo.GetServicesByUser(
+	services, err := service.serviceRepo.GetServicesByUserID(
 		ctx,
 		userID,
 	)
+
 	if err != nil {
 		return nil, fmt.Errorf(
 			"get services: %w",
 			err,
-		)
-	}
-
-	// Repository currently returns any
-	services, ok := result.([]models.Services)
-	if !ok {
-		return nil, fmt.Errorf(
-			"invalid services data returned from repository",
 		)
 	}
 

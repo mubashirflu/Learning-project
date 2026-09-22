@@ -27,9 +27,9 @@ func (repositories *Appointments) CreateAppointment(ctx context.Context, input A
 	err := repositories.db.QueryRowContext(
 		ctx,
 		`INSERT INTO appointments(customer_id,service_id,appointment_date,start_time,end_time,status)
-		VALUES ($1,$2,$3,$4,$5,$6)
-		RETURNING id,customer_id,service_id,appointment_date,start_time,end_time,status,created_at
-		`,
+			VALUES ($1,$2,$3,$4,$5,$6)
+			RETURNING id,customer_id,service_id,appointment_date,start_time,end_time,status,created_at
+			`,
 		input.CustomerID,
 		input.ServiceID,
 		input.AppointmentDate,
@@ -53,11 +53,11 @@ func (repositories *Appointments) GetAppointmentsByCustomer(
 	customerID uint,
 ) ([]models.Appointments, error) {
 	return repositories.getAppointments(ctx, `
-		SELECT id, customer_id, service_id, appointment_date, start_time, end_time, status, created_at
-		FROM appointments
-		WHERE customer_id = $1
-		ORDER BY appointment_date, start_time, id
-	`, customerID)
+			SELECT id, customer_id, service_id, appointment_date, start_time, end_time, status, created_at
+			FROM appointments
+			WHERE customer_id = $1
+			ORDER BY appointment_date, start_time, id
+		`, customerID)
 }
 
 func (repositories *Appointments) GetAppointmentsByDate(
@@ -66,11 +66,11 @@ func (repositories *Appointments) GetAppointmentsByDate(
 	appointmentDate time.Time,
 ) ([]models.Appointments, error) {
 	return repositories.getAppointments(ctx, `
-		SELECT id, customer_id, service_id, appointment_date, start_time, end_time, status, created_at
-		FROM appointments
-		WHERE service_id = $1 AND appointment_date = $2
-		ORDER BY start_time, id
-	`, serviceID, appointmentDate)
+			SELECT id, customer_id, service_id, appointment_date, start_time, end_time, status, created_at
+			FROM appointments
+			WHERE service_id = $1 AND appointment_date = $2
+			ORDER BY start_time, id
+		`, serviceID, appointmentDate)
 }
 
 func (repositories *Appointments) CheckAvailability(
@@ -84,14 +84,14 @@ func (repositories *Appointments) CheckAvailability(
 	err := repositories.db.QueryRowContext(
 		ctx,
 		`SELECT EXISTS (
-			SELECT 1
-			FROM appointments
-			WHERE service_id = $1
-			  AND appointment_date = $2
-			  AND status <> 'cancelled'
-			  AND start_time < $4
-			  AND end_time > $3
-		)`,
+				SELECT 1
+				FROM appointments
+				WHERE service_id = $1
+				AND appointment_date = $2
+				AND status <> 'cancelled'
+				AND start_time < $4
+				AND end_time > $3
+			)`,
 		serviceID,
 		appointmentDate,
 		startTime,
@@ -108,8 +108,8 @@ func (repositories *Appointments) CancelAppointment(
 	result, err := repositories.db.ExecContext(
 		ctx,
 		`UPDATE appointments
-		 SET status = 'cancelled'
-		 WHERE id = $1`,
+			SET status = 'cancelled'
+			WHERE id = $1`,
 		appointmentID,
 	)
 	if err != nil {
@@ -172,22 +172,22 @@ func (repositories *Appointments) GetAppointmentsByUserAndDate(
 	rows, err := repositories.db.QueryContext(
 		ctx,
 		`
-		SELECT
-			a.id,
-			a.customer_id,
-			a.service_id,
-			a.appointment_date,
-			a.start_time,
-			a.end_time,
-			a.status,
-			a.created_at
-		FROM appointments a
-		JOIN services s
-			ON s.id = a.service_id
-		WHERE s.user_id = $1
-		  AND a.appointment_date = $2
-		ORDER BY a.start_time, a.id
-		`,
+			SELECT
+				a.id,
+				a.customer_id,
+				a.service_id,
+				a.appointment_date,
+				a.start_time,
+				a.end_time,
+				a.status,
+				a.created_at
+			FROM appointments a
+			JOIN services s
+				ON s.id = a.service_id
+			WHERE s.user_id = $1
+			AND a.appointment_date = $2
+			ORDER BY a.start_time, a.id
+			`,
 		userID,
 		appointmentDate,
 	)

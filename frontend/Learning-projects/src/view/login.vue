@@ -127,7 +127,7 @@ const handleLogin = async () => {
 
   isSubmitting.value = true
   try {
-    await authStore.login(email.value, password.value)
+    await authStore.login({email:email.value,password: password.value})
     router.push('/dashboard')
   } catch (err) {
     errorMessage.value = err?.response?.data?.message || 'Could not sign in. Check your details and try again.'
