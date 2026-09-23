@@ -52,7 +52,7 @@
         <tbody>
           <tr v-for="service in filteredServices" :key="service.id">
             <td class="cell-name">{{ service.name }}</td>
-            <td>{{ service.duration }} min</td>
+            <td>{{ service.duration_minutes }} min</td>
             <td>{{ formatPrice(service.price) }}</td>
             <td class="cell-desc">{{ service.description || '—' }}</td>
             <td class="actions-col">

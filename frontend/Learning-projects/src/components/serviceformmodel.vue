@@ -88,7 +88,7 @@ const isEditMode = computed(() => !!props.service)
 
 const form = reactive({
   name: props.service?.name ?? '',
-  duration: props.service?.duration ?? (null as number | null),
+  duration: props.service?.duration_minutes ?? (null as number | null),
   price: props.service?.price ?? (null as number | null),
   description: props.service?.description ?? ''
 })
@@ -112,7 +112,7 @@ const handleSubmit = async () => {
 
   const payload = {
     name: form.name,
-    duration: form.duration,
+    duration_minutes: form.duration,
     price: form.price,
     description: form.description
   }
